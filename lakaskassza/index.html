@@ -19,6 +19,10 @@
   --pa: #2E6CA4;
   --pb: #C24E6E;
   --danger: #B3261E;
+  --warn: #8A4B00;
+  --warn-soft: #FCEFD8;
+  --tri: #E8A317;
+  --tri-on: #2B1D00;
   --scrim: rgba(8, 14, 11, .5);
   --shadow: 0 1px 2px rgba(16, 28, 22, .06), 0 10px 30px rgba(16, 28, 22, .10);
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -28,6 +32,7 @@
   :root:not([data-theme="light"]) {
     --bg: #111614; --surface: #18201D; --surface-2: #222C28; --ink: #E7EDE9; --ink-2: #B5C1BB; --muted: #8A9791; --line: #2D3934;
     --accent: #8CC7AE; --accent-ink: #0D1A14; --accent-soft: #1C2F27; --pa: #4F8FD0; --pb: #DB6487; --danger: #F2867C;
+    --warn: #F2BE5C; --warn-soft: #33270F; --tri: #F0B43C; --tri-on: #2B1D00;
     --scrim: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .45);
     color-scheme: dark;
   }
@@ -35,6 +40,7 @@
 :root[data-theme="dark"] {
   --bg: #111614; --surface: #18201D; --surface-2: #222C28; --ink: #E7EDE9; --ink-2: #B5C1BB; --muted: #8A9791; --line: #2D3934;
   --accent: #8CC7AE; --accent-ink: #0D1A14; --accent-soft: #1C2F27; --pa: #4F8FD0; --pb: #DB6487; --danger: #F2867C;
+  --warn: #F2BE5C; --warn-soft: #33270F; --tri: #F0B43C; --tri-on: #2B1D00;
   --scrim: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .45);
   color-scheme: dark;
 }
@@ -156,6 +162,28 @@ div.row { cursor: default; }
 .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .74rem; line-height: 1; padding: 4px 7px; border-radius: 6px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
 .chip svg { width: 13px; height: 13px; }
 .chip .dot { width: 7px; height: 7px; }
+.chip.warn { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+.tri { display: inline-block; width: 15px; height: 15px; flex: none; vertical-align: -2px; }
+.tri .tri-bg { fill: var(--tri); stroke: var(--tri); }
+.tri .tri-fg { fill: var(--tri-on); stroke: var(--tri-on); }
+.chip .tri { width: 12px; height: 12px; }
+.row-amt.amt-due { color: var(--warn); }
+
+/* Pending cash-on-delivery strip */
+.due { background: var(--warn-soft); border-radius: 18px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.due-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.due-head .tri { width: 18px; height: 18px; }
+.due-title { font-family: var(--f-display); font-weight: 600; font-size: 1.05rem; color: var(--ink); }
+.due-sum { color: var(--warn); font-weight: 600; font-variant-numeric: tabular-nums; }
+.due-help { font-size: .82rem; color: var(--ink-2); flex-basis: 100%; }
+.due-list { display: flex; flex-direction: column; }
+.due-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.due-name { font-weight: 600; overflow-wrap: anywhere; }
+.due-meta { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--ink-2); grid-column: 1; }
+.due-amt { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; grid-row: 1 / span 2; grid-column: 2; }
+.due-item .btn { grid-row: 1 / span 2; grid-column: 3; }
+.btn.small { min-height: 34px; padding: 5px 12px; font-size: .82rem; }
+.btn.small svg { width: 14px; height: 14px; }
 
 .empty { padding: 34px 24px 38px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; border-top: 1px solid var(--line); }
 .empty svg { width: 44px; height: 44px; color: var(--muted); }
@@ -224,6 +252,9 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
   .people, .balance { padding: 18px; }
   .person-amt { font-size: 1.3rem; }
   .top-actions .btn.ghost .lbl { display: none; }
+  .due-item { grid-template-columns: minmax(0, 1fr) auto; }
+  .due-amt { grid-row: 1; grid-column: 2; }
+  .due-item .btn { grid-row: 2; grid-column: 2; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -288,6 +319,16 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
 
   <section class="methods" aria-label="Fizetési módok" id="methods"></section>
 
+  <section class="due" id="due" aria-label="Fizetendő utánvétek" hidden>
+    <div class="due-head">
+      <svg class="tri" viewBox="0 0 24 24" aria-hidden="true"><path class="tri-bg" d="M12 3.5 21.5 20H2.5z" stroke-width="2" stroke-linejoin="round"/><path class="tri-fg" d="M12 9.5v5" stroke-width="2.2" stroke-linecap="round"/><circle class="tri-fg" cx="12" cy="17.2" r="1.1" stroke-width="0"/></svg>
+      <h2 class="due-title">Fizetendő utánvét</h2>
+      <span class="due-sum" id="due-sum"></span>
+      <p class="due-help">Ezeket a futárnak kell kifizetni. Átvételkor nyomjátok meg a „Kifizetve” gombot, és eltűnik a háromszög.</p>
+    </div>
+    <div class="due-list" id="due-list"></div>
+  </section>
+
   <div class="main">
     <section class="panel" aria-label="Tételek és utalások">
       <div class="panel-head">
@@ -318,7 +359,13 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
         <div class="how">
           <p>Minden tétel <b>közös költség</b>, amit fele-fele arányban osztunk el kettőtök között.</p>
           <p>Ha valaki többet fizetett, a másik <b>utal neki</b>. Ezt az „Egymásnak utalt” fülön rögzítsétek, és az egyenleg azonnal frissül.</p>
+          <p>A még ki nem fizetett utánvét is beleszámít abba, aki fizetni fogja.</p>
         </div>
+      </div>
+      <div class="side-card" id="backup" hidden>
+        <h2>Biztonsági mentés</h2>
+        <p class="how">Az adatok a közös kasszában tárolódnak, az oldal frissítése nem törli őket. Ha saját példányt is szeretnétek, töltsétek le táblázatként (Excelben megnyitható).</p>
+        <div><button type="button" class="btn" id="btn-export">Letöltés táblázatként</button></div>
       </div>
     </aside>
   </div>
@@ -348,6 +395,10 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
       <fieldset class="field">
         <legend>Fizetési mód</legend>
         <div class="seg three" id="f-method-seg"></div>
+      </fieldset>
+      <fieldset class="field" id="f-status-field" hidden>
+        <legend>Kifizettétek már?</legend>
+        <div class="seg" id="f-status-seg"></div>
       </fieldset>
       <label class="field"><span>Kategória <em>(nem kötelező)</em></span><input class="input" id="f-category" list="cat-list" maxlength="40" placeholder="pl. Konyha, Bútor" autocomplete="off"></label>
       <label class="field"><span>Megjegyzés <em>(nem kötelező)</em></span><input class="input" id="f-note" maxlength="200" placeholder="pl. bolt neve, rendelésszám" autocomplete="off"></label>
@@ -425,6 +476,8 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     kartya: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m-5-5 5 5-5 5"/></svg>',
     receipt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg>',
+    tri: '<svg class="tri" viewBox="0 0 24 24" aria-hidden="true"><path class="tri-bg" d="M12 3.5 21.5 20H2.5z" stroke-width="2" stroke-linejoin="round"/><path class="tri-fg" d="M12 9.5v5" stroke-width="2.2" stroke-linecap="round"/><circle class="tri-fg" cx="12" cy="17.2" r="1.1" stroke-width="0"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>',
   };
   const METHODS = [
     { key: 'utanvet', label: 'Utánvét' },
@@ -526,6 +579,12 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     store.local[col][id] = data;
     notifyLocal(col);
   }
+  // Merges fields into an existing document; fields not named here stay untouched.
+  async function updateDoc(col, id, patch) {
+    if (state.mode === 'shared') return store.db.collection(col).doc(id).update(patch);
+    store.local[col][id] = Object.assign({}, store.local[col][id], patch);
+    notifyLocal(col);
+  }
   async function deleteDoc(col, id) {
     if (state.mode === 'shared') return store.db.collection(col).doc(id).delete();
     delete store.local[col][id];
@@ -553,13 +612,16 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
   function normExpense(r) {
     const amount = Number(r.amount);
     if (!Number.isFinite(amount)) return null;
+    const method = METHOD_LABEL[r.method] ? r.method : 'kartya';
     return {
       id: r.id,
       item: String(r.item || '').trim() || 'Névtelen tétel',
       amount: Math.max(0, Math.round(amount)),
       date: isISODate(r.date) ? r.date : todayISO(),
       payer: r.payer === 'b' ? 'b' : 'a',
-      method: METHOD_LABEL[r.method] ? r.method : 'kartya',
+      method,
+      // Cash on delivery stays "to be paid" until someone marks it paid.
+      pending: method === 'utanvet' && r.paid !== true,
       category: String(r.category || '').trim(),
       note: String(r.note || '').trim(),
       createdAt: Number(r.createdAt) || 0,
@@ -583,13 +645,19 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
   function compute() {
     const paid = { a: 0, b: 0 }, count = { a: 0, b: 0 }, sent = { a: 0, b: 0 };
     const methods = {};
-    METHODS.forEach(m => { methods[m.key] = { sum: 0, n: 0 }; });
+    METHODS.forEach(m => { methods[m.key] = { sum: 0, n: 0, dueN: 0 }; });
     const cats = new Map();
+    const due = { sum: 0, items: [] };
     for (const e of state.expenses) {
       paid[e.payer] += e.amount;
       count[e.payer] += 1;
       methods[e.method].sum += e.amount;
       methods[e.method].n += 1;
+      if (e.pending) {
+        methods[e.method].dueN += 1;
+        due.sum += e.amount;
+        due.items.push(e);
+      }
       const c = e.category || NO_CATEGORY;
       cats.set(c, (cats.get(c) || 0) + e.amount);
     }
@@ -597,7 +665,8 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     const total = paid.a + paid.b;
     // Positive: B owes A. Each person's fair share is half of the total.
     const posA = paid.a + sent.a - sent.b - total / 2;
-    return { paid, count, sent, total, posA, methods, cats };
+    due.items.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : x.createdAt - y.createdAt));
+    return { paid, count, sent, total, posA, methods, cats, due };
   }
 
   /* ---------- rendering ---------- */
@@ -656,7 +725,8 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
       split.setAttribute('aria-label', 'Még nincs költés');
       legend.innerHTML = '';
     }
-    $('#share-note').textContent = 'Összesen ' + fmt(c.total) + ' · egy főre jutó rész: ' + fmt(c.total / 2);
+    $('#share-note').textContent = 'Összesen ' + fmt(c.total) + ' · egy főre jutó rész: ' + fmt(c.total / 2) +
+      (c.due.sum ? ' · ebből fizetendő utánvét: ' + fmt(c.due.sum) : '');
   }
 
   function renderMethods(c) {
@@ -666,9 +736,24 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
         '<span class="m-icon">' + ICONS[m.key] + '</span>' +
         '<span class="m-label">' + m.label + '</span>' +
         '<span class="m-amt">' + fmt(v.sum) + '</span>' +
-        '<span class="m-cnt">' + v.n + ' tétel</span>' +
+        '<span class="m-cnt">' + v.n + ' tétel' + (v.dueN ? ' · ' + ICONS.tri + ' ' + v.dueN + ' fizetendő' : '') + '</span>' +
       '</div>';
     }).join('');
+  }
+
+  function renderDue(c) {
+    const box = $('#due');
+    const n = names();
+    box.hidden = !c.due.items.length;
+    if (!c.due.items.length) return;
+    $('#due-sum').textContent = c.due.items.length + ' tétel · ' + fmt(c.due.sum);
+    $('#due-list').innerHTML = c.due.items.map(e =>
+      '<div class="due-item">' +
+        '<span class="due-name">' + esc(e.item) + '</span>' +
+        '<span class="due-meta">' + dot(e.payer) + esc(n[e.payer]) + ' fizeti · ' + esc(dayLabel(e.date)) + '</span>' +
+        '<span class="due-amt">' + fmt(e.amount) + '</span>' +
+        (state.readOnly ? '' : '<button type="button" class="btn small" data-paid="' + esc(e.id) + '">' + ICONS.check + 'Kifizetve</button>') +
+      '</div>').join('');
   }
 
   function renderCats(c) {
@@ -694,9 +779,10 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     const payers = [['all', 'Mindenki', ''], ['a', n.a, dot('a')], ['b', n.b, dot('b')]];
     $('#f-payers').innerHTML = payers.map(([k, label, d]) =>
       '<button type="button" class="fchip" data-payer="' + k + '" aria-pressed="' + (state.fPayer === k) + '">' + d + esc(label) + '</button>').join('');
-    const methods = [['all', 'Minden mód']].concat(METHODS.map(m => [m.key, m.label]));
-    $('#f-methods').innerHTML = methods.map(([k, label]) =>
-      '<button type="button" class="fchip" data-method="' + k + '" aria-pressed="' + (state.fMethod === k) + '">' + esc(label) + '</button>').join('');
+    const methods = [['all', 'Minden mód', '']].concat(METHODS.map(m => [m.key, m.label, '']));
+    if (state.expenses.some(e => e.pending) || state.fMethod === 'pending') methods.push(['pending', 'Fizetendő', ICONS.tri]);
+    $('#f-methods').innerHTML = methods.map(([k, label, icon]) =>
+      '<button type="button" class="fchip" data-method="' + k + '" aria-pressed="' + (state.fMethod === k) + '">' + icon + esc(label) + '</button>').join('');
   }
 
   function emptyBlock(title, text) {
@@ -743,7 +829,7 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     const q = state.q.trim().toLowerCase();
     const rows = state.expenses.filter(e =>
       (state.fPayer === 'all' || e.payer === state.fPayer) &&
-      (state.fMethod === 'all' || e.method === state.fMethod) &&
+      (state.fMethod === 'all' || e.method === state.fMethod || (state.fMethod === 'pending' && e.pending)) &&
       (!q || (e.item + ' ' + e.category + ' ' + e.note).toLowerCase().includes(q))
     ).sort(byNewest);
 
@@ -766,15 +852,17 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
       html += '<' + tag + extra + ' class="row" data-id="' + esc(e.id) + '">' +
         '<span class="row-date">' + esc(dayLabel(e.date)) + '</span>' +
         '<span class="row-main">' +
-          '<span class="row-title">' + esc(e.item) + '</span>' +
+          '<span class="row-title">' + (e.pending ? '<span title="Fizetendő">' + ICONS.tri + '</span>' : '') + esc(e.item) + '</span>' +
           '<span class="row-meta">' +
             '<span class="chip">' + dot(e.payer) + esc(n[e.payer]) + '</span>' +
-            '<span class="chip">' + ICONS[e.method] + METHOD_LABEL[e.method] + '</span>' +
+            (e.pending
+              ? '<span class="chip warn">' + ICONS[e.method] + METHOD_LABEL[e.method] + ' · fizetendő</span>'
+              : '<span class="chip">' + ICONS[e.method] + METHOD_LABEL[e.method] + '</span>') +
             (e.category ? '<span class="chip">' + esc(e.category) + '</span>' : '') +
           '</span>' +
           (e.note ? '<span class="row-note">' + esc(e.note) + '</span>' : '') +
         '</span>' +
-        '<span class="row-amt">' + fmt(e.amount) + '</span>' +
+        '<span class="row-amt' + (e.pending ? ' amt-due' : '') + '">' + fmt(e.amount) + '</span>' +
       '</' + tag + '>';
     }
     list.innerHTML = html;
@@ -808,6 +896,7 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     renderNames();
     renderSummary(c);
     renderMethods(c);
+    renderDue(c);
     renderCats(c);
     renderFilters();
     renderList();
@@ -857,6 +946,14 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
   // Expense form
   $('#f-method-seg').innerHTML = METHODS.map(m =>
     '<label><input type="radio" name="method" value="' + m.key + '" id="f-m-' + m.key + '"><span class="seg-btn">' + ICONS[m.key] + m.label + '</span></label>').join('');
+  $('#f-status-seg').innerHTML =
+    '<label><input type="radio" name="status" value="pending" id="f-st-pending"><span class="seg-btn">' + ICONS.tri + 'Még fizetendő</span></label>' +
+    '<label><input type="radio" name="status" value="paid" id="f-st-paid"><span class="seg-btn">' + ICONS.check + 'Kifizetve</span></label>';
+  function syncStatusField() {
+    const m = (document.querySelector('input[name="method"]:checked') || {}).value;
+    $('#f-status-field').hidden = m !== 'utanvet';
+  }
+  $('#f-method-seg').addEventListener('change', syncStatusField);
   let editingExpense = null;
   function openExpense(e) {
     editingExpense = e || null;
@@ -868,6 +965,8 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     $('#f-payer-' + payer).checked = true;
     const method = e ? e.method : (METHOD_LABEL[prefs.lastMethod] ? prefs.lastMethod : 'kartya');
     $('#f-m-' + method).checked = true;
+    $(e && !e.pending ? '#f-st-paid' : '#f-st-pending').checked = true;
+    syncStatusField();
     $('#f-category').value = e ? e.category : '';
     $('#f-note').value = e ? e.note : '';
     $('#f-delete').hidden = !e;
@@ -890,22 +989,25 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     if (amount > 1e10) return showError('#f-error', 'Ez az összeg túl nagy. Ellenőrizd a számot.');
     if (!isISODate(date)) return showError('#f-error', 'Válassz dátumot.');
     if (!payer || !method) return showError('#f-error', 'Válaszd ki, ki fizette és hogyan.');
-    const id = editingExpense ? editingExpense.id : newId();
+    const status = (document.querySelector('input[name="status"]:checked') || {}).value;
+    const paid = method !== 'utanvet' || status === 'paid';
     const now = Date.now();
     const data = {
-      item, amount, date, payer, method,
+      item, amount, date, payer, method, paid,
       category: $('#f-category').value.trim(),
       note: $('#f-note').value.trim(),
-      createdAt: editingExpense ? (editingExpense.createdAt || now) : now,
       updatedAt: now,
     };
     $('#f-save').disabled = true;
-    const err = await write(() => putDoc('expenses', id, data));
+    // Edits merge into the stored document, so nothing already saved on it is dropped.
+    const err = editingExpense
+      ? await write(() => updateDoc('expenses', editingExpense.id, data))
+      : await write(() => putDoc('expenses', newId(), Object.assign({ createdAt: now }, data)));
     $('#f-save').disabled = false;
     if (err) return showError('#f-error', err);
     prefs.lastPayer = payer; prefs.lastMethod = method; savePrefs();
     closeDialog($('#dlg-expense'));
-    toast(editingExpense ? 'Tétel frissítve' : 'Tétel rögzítve');
+    toast((editingExpense ? 'Tétel frissítve' : 'Tétel rögzítve') + (paid ? '' : ' · fizetendő'));
   });
   $('#f-delete').addEventListener('click', async (ev) => {
     const btn = ev.currentTarget;
@@ -948,16 +1050,12 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     if (!Number.isFinite(amount) || amount <= 0) return showError('#t-error', 'Az összeg legyen pozitív szám forintban.');
     if (amount > 1e10) return showError('#t-error', 'Ez az összeg túl nagy. Ellenőrizd a számot.');
     if (!isISODate(date)) return showError('#t-error', 'Válassz dátumot.');
-    const id = editingTransfer ? editingTransfer.id : newId();
     const now = Date.now();
-    const data = {
-      from, amount, date,
-      note: $('#t-note').value.trim(),
-      createdAt: editingTransfer ? (editingTransfer.createdAt || now) : now,
-      updatedAt: now,
-    };
+    const data = { from, amount, date, note: $('#t-note').value.trim(), updatedAt: now };
     $('#t-save').disabled = true;
-    const err = await write(() => putDoc('transfers', id, data));
+    const err = editingTransfer
+      ? await write(() => updateDoc('transfers', editingTransfer.id, data))
+      : await write(() => putDoc('transfers', newId(), Object.assign({ createdAt: now }, data)));
     $('#t-save').disabled = false;
     if (err) return showError('#t-error', err);
     closeDialog($('#dlg-transfer'));
@@ -1023,6 +1121,55 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     state.fMethod = b.dataset.method; renderFilters(); renderList();
   });
   $('#f-search').addEventListener('input', (ev) => { state.q = ev.target.value; renderList(); });
+  $('#due-list').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('[data-paid]');
+    if (!b || state.readOnly) return;
+    b.disabled = true;
+    const err = await write(() => updateDoc('expenses', b.dataset.paid, { paid: true, paidAt: todayISO(), updatedAt: Date.now() }));
+    if (err) { b.disabled = false; toast(err); return; }
+    toast('Kifizetve');
+  });
+
+  /* ---------- backup ---------- */
+  let downloads = null;
+  function buildCsv() {
+    const n = names();
+    const cell = (v) => {
+      let s = String(v ?? '');
+      if (/^[=+\-@]/.test(s)) s = "'" + s;
+      return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const lines = [['Dátum', 'Tétel', 'Összeg (Ft)', 'Ki fizette', 'Fizetési mód', 'Állapot', 'Kategória', 'Megjegyzés'].join(';')];
+    state.expenses.slice().sort(byNewest).forEach(e => lines.push(
+      [e.date, e.item, e.amount, n[e.payer], METHOD_LABEL[e.method], e.pending ? 'Fizetendő' : 'Kifizetve', e.category, e.note].map(cell).join(';')));
+    lines.push('', ['Dátum', 'Ki utalt', 'Kinek', 'Összeg (Ft)', 'Megjegyzés'].join(';'));
+    state.transfers.slice().sort(byNewest).forEach(t => lines.push(
+      [t.date, n[t.from], n[other(t.from)], t.amount, t.note].map(cell).join(';')));
+    return '﻿' + lines.join('\r\n');
+  }
+  $('#btn-export').addEventListener('click', async () => {
+    const data = buildCsv();
+    const filename = 'lakaskassza-' + todayISO() + '.csv';
+    if (downloads) {
+      try {
+        const res = await downloads.save({ filename, data });
+        if (res && res.status === 'saved') toast('Táblázat letöltve');
+      } catch (err) {
+        const code = err && err.code;
+        if (code === 'declined') return;
+        if (code === 'rate_limited') { toast('Már nyitva van egy mentési ablak.'); return; }
+        toast('A letöltés itt nem érhető el.');
+        $('#backup').hidden = true;
+      }
+      return;
+    }
+    // Standalone copy opened outside claude.ai: plain browser download.
+    const url = URL.createObjectURL(new Blob([data], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
   $('#list').addEventListener('click', (ev) => {
     if (state.readOnly) return;
     const r = ev.target.closest('button.row'); if (!r) return;
@@ -1061,7 +1208,9 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 2
     if (c && typeof c.use === 'function') {
       try { db = await c.use('db'); } catch (e) { db = null; }
       try { user = await c.use('user'); } catch (e) { user = null; }
+      try { downloads = await c.use('downloads'); } catch (e) { downloads = null; }
     }
+    $('#backup').hidden = !(downloads || !c);
     if (db) {
       store.db = db;
       state.mode = 'shared';
